@@ -14,7 +14,7 @@ public class WeatherService {
 
     private static final String API_KEY = "ccbf1df571msh1d7babd1a6dd767p1256d3jsn74bae50818b5";
     private static final String API_HOST = "forecast9.p.rapidapi.com";
-    private static final String API_URL = "https://forecast9.p.rapidapi.com/rapidapi/forecast/Berlin";
+    private static final String API_URL = "https://forecast9.p.rapidapi.com/rapidapi/forecast/";
 
     private final RestTemplate restTemplate;
 
@@ -22,14 +22,14 @@ public class WeatherService {
         this.restTemplate = restTemplate;
     }
 
-    public String getWeatherData() {
+    public String getWeatherData(String city) {
         try {
             //String url = API_URL + "/summary?apiKey=" + API_KEY;
             HttpHeaders headers = new HttpHeaders();
             headers.add("X-RapidAPI-Key", API_KEY);
             headers.add("X-RapidAPI-Host", API_HOST);
 
-            RequestEntity<Void> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, new URI(API_URL + "/summary/"));
+            RequestEntity<Void> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, new URI(API_URL + city +"/summary/"));
 
             ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
             return responseEntity.getBody();
@@ -42,14 +42,14 @@ public class WeatherService {
         }
     }
 
-    public String getHourlyWeather() {
+    public String getHourlyWeather(String city) {
         try {
             /*String url = API_URL + "/hourly?apiKey=" + API_KEY;*/
             HttpHeaders headers = new HttpHeaders();
             headers.add("X-RapidAPI-Key", API_KEY);
             headers.add("X-RapidAPI-Host", API_HOST);
 
-            RequestEntity<Void> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, new URI(API_URL + "/hourly/"));
+            RequestEntity<Void> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, new URI(API_URL + city + "/hourly/"));
 
             ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
             return responseEntity.getBody();
