@@ -1,11 +1,14 @@
 package com.example.weatherapidemo.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URI;
 
@@ -22,7 +25,7 @@ public class WeatherService {
         this.restTemplate = restTemplate;
     }
 
-    public String getWeatherData(String city) {
+    public ResponseEntity<JsonNode> getWeatherData(String city) {
         try {
             //String url = API_URL + "/summary?apiKey=" + API_KEY;
             HttpHeaders headers = new HttpHeaders();
@@ -32,17 +35,23 @@ public class WeatherService {
             RequestEntity<Void> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, new URI(API_URL + city +"/summary/"));
 
             ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
-            return responseEntity.getBody();
-        } catch (URISyntaxException | HttpClientErrorException | HttpServerErrorException e) {
-            if (e instanceof HttpClientErrorException && ((HttpClientErrorException) e).getStatusCode() == HttpStatus.NOT_FOUND) {
-                return "Weather data not found";
-            } else {
-                return "Error fetching weather data: " + e.getMessage();
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode =objectMapper.readTree(responseEntity.getBody());
+            String formattedJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+            return ResponseEntity.ok()
+                    .headers(responseHeaders)
+                    .body(objectMapper.readTree(formattedJson));
+        } catch (URISyntaxException | HttpClientErrorException | HttpServerErrorException | IOException e) {
+            {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
         }
     }
 
-    public String getHourlyWeather(String city) {
+    public ResponseEntity<JsonNode> getHourlyWeather(String city) {
         try {
             /*String url = API_URL + "/hourly?apiKey=" + API_KEY;*/
             HttpHeaders headers = new HttpHeaders();
@@ -52,12 +61,20 @@ public class WeatherService {
             RequestEntity<Void> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, new URI(API_URL + city + "/hourly/"));
 
             ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
-            return responseEntity.getBody();
-        } catch (URISyntaxException | HttpClientErrorException | HttpServerErrorException e) {
-            if (e instanceof HttpClientErrorException && ((HttpClientErrorException) e).getStatusCode() == HttpStatus.NOT_FOUND) {
-                return "Hourly weather data not found";
-            } else {
-                return "Error fetching hourly weather data: " + e.getMessage();
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode =objectMapper.readTree(responseEntity.getBody());
+            String formattedJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+            return ResponseEntity.ok()
+                    .headers(responseHeaders)
+                    .body(objectMapper.readTree(formattedJson));
+            //return objectMapper.readTree(responseEntity.getBody());
+        } catch (URISyntaxException | HttpClientErrorException | HttpServerErrorException | IOException e) {
+            //if (e instanceof HttpClientErrorException && ((HttpClientErrorException) e).getStatusCode() == HttpStatus.NOT_FOUND)
+            {
+                e.printStackTrace();
+                return null;
             }
         }
     }
