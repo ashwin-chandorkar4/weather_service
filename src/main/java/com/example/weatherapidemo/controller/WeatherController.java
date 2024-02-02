@@ -1,6 +1,8 @@
 package com.example.weatherapidemo.controller;
 
 import com.example.weatherapidemo.service.WeatherService;
+import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,19 +18,18 @@ public class WeatherController {
         this.weatherService = weatherService;
     }
 
-    @GetMapping("/")
+    /*@GetMapping("/")
     public String getDefault() {
-        return "Default endpoint";
-    }
+        return "Default endpoint";*/
+
     @GetMapping("/summary")
-    public String getWeatherSummary(@RequestParam String city) {
-        String weatherData = weatherService.getWeatherData(city);
-        return "Weather Summary: " + weatherData;
+    public ResponseEntity<JsonNode> getWeatherSummary(@RequestParam String city) {
+        return weatherService.getWeatherData(city);
+
     }
 
     @GetMapping("/hourly")
-    public String getHourlyWeather(@RequestParam String city) {
-        String hourlyData = weatherService.getHourlyWeather(city);
-        return "Hourly Weather: " + hourlyData;
+    public ResponseEntity<JsonNode> getHourlyWeather(@RequestParam String city) {
+        return weatherService.getWeatherData(city);
     }
 }

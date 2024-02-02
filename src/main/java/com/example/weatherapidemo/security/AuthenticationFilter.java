@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -34,7 +35,12 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } else {
             // If validation fails, send a 401 Unauthorized response
-            response.sendError(HttpStatus.UNAUTHORIZED.value(), "Invalid credentials");
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+            String errorMessage = "{\"error\":\"Invalid credentials\", \"Provide valid ones\"}";
+            response.getWriter().write(errorMessage);
+            response.getWriter().flush();
             return;
         }
 
